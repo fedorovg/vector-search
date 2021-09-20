@@ -1,48 +1,56 @@
 from typing import *
-
+from prepocessor import Preprocessor
 from collections import Counter
+import numpy as np
 import os
 
 
 class SearchEngine:
     
-    def __init__(self, documents_path: str):
+    def __init__(self, documents_path: str, k=1):
         self.documents_path = documents_path
-        self.counts = Counter({})
-        self.mapping = {}
-
-    def count_all_words(self):
+        # throughout this file tf refers to term frequency (number of occurrences of a word)
+        self.doc_count = 0
+        # Tuning parameter k: Should be decreased for datasets with large documents and increased for the small ones
+        self.k = k
+        self.vector_dim = 0  # Number of unique terms
+        self.mapping = {}  # Mapping of a word to index in a vector
+        self.tfs = []  # vectors for each document
+        self.idf = None  # Inverse document frequencies
+        self.average_doc_length = 0
+    
+   
+    def get_term_counts(self) -> Tuple[Dict[str, Counter], Counter]:
         """
-        Counts occurrences of each word in the whole document set.
+        Counts occurrences of each word in the whole document set and per document.
         These counts will be used to calculate values of the vectors
-        :return:
+        :return: Term frequencies for each document and global tfs.
         """
+        global_tf = Counter({})
+        doc_tfs = {}
         for document in os.listdir(self.documents_path):
             with open(f"{self.documents_path}/{document}", "r") as f:
                 words = [
                     word for line in f.readlines()
                     for word in line.split()
                 ]
-                self.counts += Counter(words)
-                
-    def map_words_to_index(self):
+                doc_tf = Counter(words)
+                doc_tfs[document] = doc_tf
+                global_tf += doc_tf
+        
+        return doc_tfs, global_tf
+    
+  
+    def create_mapping(self, global_tf: Counter) -> Dict[str, int]:
         """
-        Creates a mapping from each word to it's index inside of a vector.
+        Creates a mapping from each word to it's index inside a vectors.
         :return:
         """
-        words = self.counts.keys()
-        self.mapping = dict(
-            zip(
-                words, range(len(words))
-            )
+        words = global_tf.keys()
+        return dict(
+            zip(words, range(self.vector_dim))
         )
-    
-        
-    
-
+   
 
 if __name__ == "__main__":
     engine = SearchEngine("data/articles/processed")
-    engine.count_all_words()
-    engine.map_words_to_index()
-    print(engine.mapping)
