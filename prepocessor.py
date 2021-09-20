@@ -6,19 +6,19 @@ import nltk
 
 def split_csv_into_articles_and_process(csv_path: str,
                                         stopwords_path="./data/stopwords.txt",
-                                        max_articles_to_extract: int = 100) -> None:
+                                        limit: int = 100) -> None:
     """
     This function runs whole preprocessing pipeline on each row in csv
     and stores both raw and processed versions to the filesystem.
     :param csv_path: path to csv file with the dataset
     :param stopwords_path: path to a file with additional stopwords
-    :param max_articles_to_extract: limits number of documents, that will be extracted
+    :param limit: limits number of documents, that will be extracted
     :return:
     """
     df = pd.read_csv(csv_path)
     p = Preprocessor(additional_stopwords_path=stopwords_path)
     for i, row in df.iterrows():
-        if i >= max_articles_to_extract:
+        if i >= limit:
             break
         
         article_name = row.title.replace("/", "")
@@ -88,4 +88,4 @@ class Preprocessor:
 
 
 if __name__ == "__main__":
-    split_csv_into_articles_and_process("./data/articles1.csv", max_articles_to_extract=1)
+    split_csv_into_articles_and_process("./data/articles1.csv", limit=1)
