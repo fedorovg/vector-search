@@ -70,6 +70,16 @@ class SearchEngine:
         return dict(
             zip(words, range(self.vector_dim))
         )
+    
+    @staticmethod
+    def calculate_idf(tfs: List[Tuple[str, np.ndarray]]) -> np.ndarray:
+        """
+        Computes inverse document frequency for all terms. (Number of documents that contain a term)
+        :return: Vector of idfs
+        """
+        df = sum([vec.clip(max=1) for (_, vec) in tfs])
+        return np.log(len(tfs) / df)  # df can not contain zeros, since any word is present in at least one document
+
    
 
 if __name__ == "__main__":
