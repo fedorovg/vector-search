@@ -26,7 +26,7 @@ def split_csv_into_articles_and_process(csv_path: str,
         processed_path = f"./data/articles/processed/{article_name}"
         
         with open(raw_path, "w+") as f:
-            f.write(row.content)
+            f.write(article_name + " " + row.content)
         
         with open(processed_path, "w+") as f:
             processed = " ".join(p.process(row.content))
@@ -88,4 +88,4 @@ class Preprocessor:
 
 
 if __name__ == "__main__":
-    split_csv_into_articles_and_process("./data/articles1.csv", limit=1)
+    split_csv_into_articles_and_process("./data/articles1.csv", limit=1000)
