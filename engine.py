@@ -19,7 +19,20 @@ class SearchEngine:
         self.idf = None  # Inverse document frequencies
         self.average_doc_length = 0
     
-   
+     def generate_vectors(self):
+        """
+        Sets model up by generating vectors from documents and precomputing additional data. (e.g. idf)
+        :return:
+        """
+        counts, global_counts = self.get_term_counts()
+        # After counting all terms in our documents, we can create a mapping and decide on the vector dimentions
+        self.vector_dim = len(global_counts)
+        self.mapping = self.create_mapping(global_counts)
+        self.tfs = self.counts_to_vectors(counts)
+        self.doc_count = len(self.tfs)
+        self.idf = self.calculate_idf(self.tfs)
+        self.average_doc_length = np.sum(sum([v for _, v in self.tfs])) / self.doc_count
+
     def get_term_counts(self) -> Tuple[Dict[str, Counter], Counter]:
         """
         Counts occurrences of each word in the whole document set and per document.
