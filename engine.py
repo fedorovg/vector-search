@@ -19,6 +19,17 @@ class SearchEngine:
         self.idf = None  # Inverse document frequencies
         self.average_doc_length = 0
     
+    def find_matches(self, query: List[str], top=10):
+        """
+        This method find top n documents that are most similar to the query.
+        :param query:
+        :param top:
+        :return: list of document names
+        """
+        q_tf = self.vectorize_query(query)
+        best_matches = sorted(self.tfs, key=lambda doc: self.calculate_similarity(q_tf, doc[1]), reverse=True)[:top]
+        return [name for name, _ in best_matches]
+    
     def calculate_similarity(self, q_tf: np.ndarray, d_tf: np.ndarray):
         """
         Calculates similarity between a query vector and a document and expresses it as a number.
