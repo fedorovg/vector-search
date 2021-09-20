@@ -40,6 +40,26 @@ class SearchEngine:
         
         return doc_tfs, global_tf
     
+      def counter_to_vector(self, counter: Counter) -> np.ndarray:
+        """
+        Creates a vector from a Counter according to the self.mapping
+        :param counter:
+        :return: A tf vector
+        """
+        res = np.zeros(self.vector_dim)
+        for term, count in counter.items():
+            res[self.mapping[term]] = count
+        return res
+    
+    def counts_to_vectors(self, counts: Dict[str, Counter]) -> List[Tuple[str, np.ndarray]]:
+        """
+        This method transforms word counts into tf vectors
+        :param counts:
+        :return:
+        """
+        return [
+            (k, self.counter_to_vector(v)) for k, v in counts.items()
+        ]
   
     def create_mapping(self, global_tf: Counter) -> Dict[str, int]:
         """
