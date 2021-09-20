@@ -9,6 +9,7 @@ class SearchEngine:
     def __init__(self, documents_path: str):
         self.documents_path = documents_path
         self.counts = Counter({})
+        self.mapping = {}
 
     def count_all_words(self):
         """
@@ -24,7 +25,17 @@ class SearchEngine:
                 ]
                 self.counts += Counter(words)
                 
-    
+    def map_words_to_index(self):
+        """
+        Creates a mapping from each word to it's index inside of a vector.
+        :return:
+        """
+        words = self.counts.keys()
+        self.mapping = dict(
+            zip(
+                words, range(len(words))
+            )
+        )
     
         
     
@@ -33,4 +44,5 @@ class SearchEngine:
 if __name__ == "__main__":
     engine = SearchEngine("data/articles/processed")
     engine.count_all_words()
+    engine.map_words_to_index()
     print(engine.mapping)
