@@ -19,6 +19,16 @@ class SearchEngine:
         self.idf = None  # Inverse document frequencies
         self.average_doc_length = 0
     
+    def calculate_similarity(self, q_tf: np.ndarray, d_tf: np.ndarray):
+        """
+        Calculates similarity between a query vector and a document and expresses it as a number.
+        :param q_tf: query vector
+        :param d_tf: document vector
+        :return: similarity number
+        """
+        freq_norm = np.sum(d_tf) / self.average_doc_length * self.k + d_tf
+        return np.sum(q_tf * (d_tf / freq_norm) * self.idf)
+    
     def vectorize_query(self, query_terms: List[str]) -> np.ndarray:
         """
         Takes a query and transforms it into a tf vector.
