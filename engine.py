@@ -19,7 +19,15 @@ class SearchEngine:
         self.idf = None  # Inverse document frequencies
         self.average_doc_length = 0
     
-     def generate_vectors(self):
+    def vectorize_query(self, query_terms: List[str]) -> np.ndarray:
+        """
+        Takes a query and transforms it into a tf vector.
+        :param query_terms:
+        :return:
+        """
+        return self.counter_to_vector(Counter(query_terms))
+    
+    def generate_vectors(self):
         """
         Sets model up by generating vectors from documents and precomputing additional data. (e.g. idf)
         :return:
@@ -32,7 +40,7 @@ class SearchEngine:
         self.doc_count = len(self.tfs)
         self.idf = self.calculate_idf(self.tfs)
         self.average_doc_length = np.sum(sum([v for _, v in self.tfs])) / self.doc_count
-
+    
     def get_term_counts(self) -> Tuple[Dict[str, Counter], Counter]:
         """
         Counts occurrences of each word in the whole document set and per document.
@@ -53,7 +61,7 @@ class SearchEngine:
         
         return doc_tfs, global_tf
     
-      def counter_to_vector(self, counter: Counter) -> np.ndarray:
+    def counter_to_vector(self, counter: Counter) -> np.ndarray:
         """
         Creates a vector from a Counter according to the self.mapping
         :param counter:
@@ -73,7 +81,7 @@ class SearchEngine:
         return [
             (k, self.counter_to_vector(v)) for k, v in counts.items()
         ]
-  
+    
     def create_mapping(self, global_tf: Counter) -> Dict[str, int]:
         """
         Creates a mapping from each word to it's index inside a vectors.
@@ -93,7 +101,10 @@ class SearchEngine:
         df = sum([vec.clip(max=1) for (_, vec) in tfs])
         return np.log(len(tfs) / df)  # df can not contain zeros, since any word is present in at least one document
 
-   
 
 if __name__ == "__main__":
     engine = SearchEngine("data/articles/processed")
+    engine.generate_vectors()
+    p = Preprocessor()
+    q = p.process("Fake news")
+    print(engine.find_matches(q))
