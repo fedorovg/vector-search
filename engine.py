@@ -6,6 +6,10 @@ import os
 
 
 class SearchEngine:
+    """
+    SearchEngine is a class that represents a vector space model.
+    It can be used to search for documents similar to a request srting.
+    """
     
     def __init__(self, documents_path: str, k=1):
         self.documents_path = documents_path
@@ -26,7 +30,12 @@ class SearchEngine:
         :param top:
         :return: list of document names
         """
-        q_tf = self.vectorize_query(query)
+        if not query:
+            return []
+        try:
+            q_tf = self.vectorize_query(query)
+        except Exception:
+            return []
         best_matches = sorted(self.tfs, key=lambda doc: self.calculate_similarity(q_tf, doc[1]), reverse=True)[:top]
         return [name for name, _ in best_matches]
     
@@ -37,7 +46,7 @@ class SearchEngine:
         :param d_tf: document vector
         :return: similarity number
         """
-        freq_norm = np.sum(d_tf) / self.average_doc_length * self.k + d_tf
+        freq_norm = np.sum(d_tf) / (self.average_doc_length * self.k + d_tf)
         return np.sum(q_tf * (d_tf / freq_norm) * self.idf)
     
     def vectorize_query(self, query_terms: List[str]) -> np.ndarray:
@@ -46,7 +55,11 @@ class SearchEngine:
         :param query_terms:
         :return:
         """
-        return self.counter_to_vector(Counter(query_terms))
+        try:
+            return self.counter_to_vector(Counter(query_terms))
+        except KeyError:
+            print("Query is wildly different from anything we have")
+            raise Exception("Cant find")
     
     def generate_vectors(self):
         """
@@ -127,5 +140,5 @@ if __name__ == "__main__":
     engine = SearchEngine("data/articles/processed")
     engine.generate_vectors()
     p = Preprocessor()
-    q = p.process("Fake news")
+    q = p.process("trump")
     print(engine.find_matches(q))
