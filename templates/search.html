@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+</head>
+<body>
+<div class="container ">
+    <div class="search-form">
+        <h1>Search page</h1>
+        <form action="" method="get">
+            <div class="form-group">
+                <input id="q" name="q" type="text" placeholder="Search query"/>
+            </div>
+            <div class="form-group">
+                <label for="limit">Number of results to display.</label>
+                <select name="limit" id="limit">
+                    <option value="20">20</option>
+                    <option value="10">10</option>
+                    <option value="30">30</option>
+                </select>
+            </div>
+            <input class="btn" type="submit">
+        </form>
+    </div>
+    {% if not article_titles and query_text %}
+    <h2>No results.</h2>
+    <p>
+        Couldn't find anything similar to your query <i>&laquo;{{ query_text }}&raquo;</i>.
+        Try something else.
+    </p>
+    {% endif %}
+    <ul class="results-list">
+        {% for article_title in article_titles %}
+        <li>
+            <a href="{{ url_for('details_page', title=article_title) }}">
+                {{ article_title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>
